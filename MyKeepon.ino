@@ -77,6 +77,21 @@ int nextInt(char* msg) {
   return value;
 }
 
+void goHome(byte* cmd, byte* device) {
+  Serial.println("Returning to home position.");
+  
+  parseMsg("MOVE PAN 0;", cmd, device);
+  parseMsg("MOVE TILT 0;", cmd, device);
+  parseMsg("SOUND STOP;", cmd, device);
+}
+
+void loopThroughTones(byte* cmd, byte* device) {
+  for (int i = 0; i < 64; i++) {
+    parseMsg(("SOUND PLAY " + String(i) + ";").c_str(), cmd, device);
+    delay(1000);
+  }
+}
+
 boolean parseMsg(char* msg, byte* cmd, byte* device) {
   int i = 0, value;
 
@@ -194,11 +209,48 @@ boolean parseMsg(char* msg, byte* cmd, byte* device) {
       Serial.println("Unknown MODE command.");
       return false;
     }
-  } 
+  }
+  else if (isNextWord(&msg[i], "DANCE", &i)) {
+    if (isNextWord(&msg[i], "PONDEMO", &i)) {
+      parseMsg("MOVE PON UP;", cmd, device);
+      delay(1000);
+      parseMsg("MOVE PON DOWN;", cmd, device);
+      delay(1000);
+      parseMsg("MOVE PON HALFUP;", cmd, device);
+      delay(1000);
+    }
+    else if (isNextWord(&msg[i], "BOB", &i)) {
+      int period = 1000;
+      parseMsg("SPEED PAN 180;", cmd, device);
+      for (int i = 0; i < 20; i++) {
+        parseMsg("MOVE TILT 80;", cmd, device);
+        parseMsg("MOVE PAN 30;", cmd, device);
+        delay(period / 2);
+        parseMsg("MOVE TILT -80;", cmd, device);
+        parseMsg("MOVE PAN -30;", cmd, device);
+        parseMsg("SOUND PLAY 60;", cmd, device);
+        delay(period / 2);
+      }
+
+      goHome(cmd, device);
+    }
+    else if (isNextWord(&msg[i], "SING", &i)) {
+      loopThroughTones(cmd, device);
+    }
+    else {
+      Serial.println("Unknown DANCE command.");
+    }
+  }
+  else if (isNextWord(&msg[i], "HOME", &i)) {
+    goHome(cmd, device);
+  }
   else {
-    Serial.println("Unknown command.");
+    Serial.println("Unknown command: ");
+    Serial.println(msg);
     return false;
   }
+  
+  writeCommands(cmd, device);
   return true;
 }
 
@@ -355,11 +407,23 @@ void query() {
   }
 }
 
+void writeCommands(byte* cmd, byte* device) {
+  int result = 1;
+  int attempts = 0;
+  while (result != 0 && attempts++ < 50) {
+    Wire.beginTransmission(*device);
+    Wire.write((byte)cmd[0]);
+    Wire.write((byte)cmd[1]);
+    result = (int)Wire.endTransmission();
+  }
+}
+
 void loop() {
   char msg[32];
   byte device, cmd[2];
 
   bootup();
+  goHome(cmd, &device);
 
   while (analogRead(0) > 512) {
     query();
@@ -370,16 +434,7 @@ void loop() {
         while (Serial.available() <= 0 && analogRead(0) > 512);
       }
       msg[i] = '\0';
-      if (parseMsg(msg, cmd, &device)) {
-        int result = 1;
-        int attempts = 0;
-        while (result != 0 && attempts++ < 50) {
-          Wire.beginTransmission(device);
-          Wire.write((byte)cmd[0]);
-          Wire.write((byte)cmd[1]);
-          result = (int)Wire.endTransmission();
-        }
-      }
+      parseMsg(msg, cmd, &device);
     }
   }
 }
