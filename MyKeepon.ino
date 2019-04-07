@@ -51,13 +51,13 @@ void bootup()
 }
 
 boolean isNextWord(char* msg, char* wordToCompare, int* i) {
-  int j = 0;
-  while (msg[j] == wordToCompare[j++]);
+  int j, k = 0;
+  while (msg[k] == ' ') k++;
+  while (msg[k++] == wordToCompare[j++]);
   if (j >= strlen(wordToCompare)) {
-    *i = *i+j;
+    *i = *i + k;
     return 1;
-  } 
-  else return 0;
+  } else return 0;
 }
 
 int nextInt(char* msg) {
@@ -99,7 +99,7 @@ boolean parseMsg(char* msg, byte* cmd, byte* device) {
       cmd[1] = B00000000;
     } 
     else {
-      Serial.println("Unknown command.");
+      Serial.println("Unknown SOUND command.");
       return false;
     }
   } 
@@ -118,7 +118,7 @@ boolean parseMsg(char* msg, byte* cmd, byte* device) {
       cmd[1] = (byte)nextInt(&msg[i]);
     } 
     else {
-      Serial.println("Unknown command.");
+      Serial.println("Unknown SPEED command.");
       return false;
     }
   } 
@@ -145,7 +145,7 @@ boolean parseMsg(char* msg, byte* cmd, byte* device) {
       else if (isNextWord(&msg[i], "LEFT", &i))
         cmd[1] = 4;
       else {
-        Serial.println("Unknown command.");
+        Serial.println("Unknown SIDE command.");
         return false;
       }
     } 
@@ -160,7 +160,7 @@ boolean parseMsg(char* msg, byte* cmd, byte* device) {
       else if (isNextWord(&msg[i], "HALFUP", &i))
         cmd[1] = -4;
       else {
-        Serial.println("Unknown command.");
+        Serial.println("Unknown PON command.");
         return false;
       }
     } 
@@ -169,7 +169,7 @@ boolean parseMsg(char* msg, byte* cmd, byte* device) {
       cmd[1] = 16;
     } 
     else {
-      Serial.println("Unknown command.");
+      Serial.println("Unknown MOVE command.");
       return false;
     }    
   } 
@@ -191,7 +191,7 @@ boolean parseMsg(char* msg, byte* cmd, byte* device) {
       cmd[1] = 240;
     } 
     else {
-      Serial.println("Unknown command.");
+      Serial.println("Unknown MODE command.");
       return false;
     }
   } 
@@ -383,5 +383,3 @@ void loop() {
     }
   }
 }
-
-
