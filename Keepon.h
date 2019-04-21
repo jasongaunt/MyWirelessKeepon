@@ -5,7 +5,7 @@ enum SideMove{
   CENTER_FROM_RIGHT,
   LEFT
 };
-enum PONMove{
+enum PonMove{
   UP,
   HALF_DOWN,
   DOWN,
