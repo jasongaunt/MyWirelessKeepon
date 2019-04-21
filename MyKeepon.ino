@@ -42,7 +42,11 @@ class Keepon {
     // Strings
     bool startsWith(char const *msg, char const *cmp);
     char const *findNextWord(char const *msg);
+    // Dance
+    void dance(Dance d);
+    int waitBeats(int b);
   private:
+    int tempo;
     boolean audioLogs;
     char msg[32];
     byte device, cmd[2];
@@ -52,6 +56,7 @@ class Keepon {
 // Setup pins and serial connection
 Keepon::Keepon() {
   audioLogs = false;
+  tempo = 120;
   pinMode(SDA, OUTPUT); // Data wire on My Keepon
   pinMode(SCL, OUTPUT); // Clock wire on My Keepon
   digitalWrite(SDA, LOW);
@@ -88,7 +93,7 @@ void Keepon::writeCommand() {
 
 void Keepon::goHome() {
   Serial.println("Returning to home position.");
-  movePan(0);
+  movePan(8);
   moveTilt(0);
   soundStop();
 }
@@ -502,6 +507,30 @@ void Keepon::readResponse() {
   }
 }
 
+//////////////   Dances   /////////////
+
+int Keepon::waitBeats(int b) {
+  int duration = 60000 / tempo;
+  delay(duration * b);
+}
+
+void Keepon::dance(Dance d) {
+  switch(d) {
+    case BOB:
+      for (int i = 0; i < 10; i++) {
+        moveTilt(80);
+        movePan(30);
+        waitBeats(1);
+        moveTilt(-80);
+        movePan(-30);
+        soundPlay(60);
+        waitBeats(1);
+      }
+      goHome();
+      break;
+  }
+}
+
 ////////////// Arduino Code /////////////
 
 Keepon *keepon;
@@ -515,6 +544,8 @@ void loop() {
   
   keepon->bootup();
   keepon->goHome();
+
+  keepon->dance(Dance(BOB));
   
   while(true) {
     keepon->readResponse();

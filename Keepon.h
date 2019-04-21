@@ -18,3 +18,7 @@ enum Mode{
   TEMPO,
   SLEEP
 };
+
+enum Dance{
+  BOB
+};
