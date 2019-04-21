@@ -44,6 +44,7 @@ class Keepon {
     char const *findNextWord(char const *msg);
     // Dance
     void dance(Dance d);
+    void setTempo(int t);
     int waitBeats(int b);
   private:
     int tempo;
@@ -509,15 +510,18 @@ void Keepon::readResponse() {
 
 //////////////   Dances   /////////////
 
+void Keepon::setTempo(int t) {
+  tempo = t;
+}
+
 int Keepon::waitBeats(int b) {
   int duration = 60000 / tempo;
   delay(duration * b);
 }
 
 void Keepon::dance(Dance d) {
-  switch(d) {
-    case BOB:
-      for (int i = 0; i < 10; i++) {
+  if (d == BOB) {
+    for (int i = 0; i < 10; i++) {
         moveTilt(80);
         movePan(30);
         waitBeats(1);
@@ -525,10 +529,9 @@ void Keepon::dance(Dance d) {
         movePan(-30);
         soundPlay(60);
         waitBeats(1);
-      }
-      goHome();
-      break;
+    }
   }
+  goHome();   
 }
 
 ////////////// Arduino Code /////////////
@@ -545,6 +548,7 @@ void loop() {
   keepon->bootup();
   keepon->goHome();
 
+  keepon->setTempo(121);
   keepon->dance(Dance(BOB));
   
   while(true) {
