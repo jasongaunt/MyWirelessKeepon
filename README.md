@@ -1,7 +1,12 @@
-My Keepon Arduino controller
+# My Keepon Arduino controller - now with added Wireless connectivity courtesy of ESP8266!
 
-by Marek Michalowski (BeatBots)
-with Kyle Machulis (Nonpolynomial Labs) & Mark Gasson (Wow! Stuff)
+## Credits
+
+* Original code by Marek Michalowski (BeatBots) with help from  Kyle Machulis (Nonpolynomial Labs) & Mark Gasson (Wow! Stuff)
+* Tweaks to BPM code by Tyler Krupicka (2019)
+* Wireless conversion by Jason Gaunt (2020)
+
+## Original release info
 
 Copyright © 2012 BeatBots LLC
 
@@ -21,16 +26,18 @@ http://mykeepon.beatbots.net
 Keepon® is a trademark of BeatBots LLC.
 
 
-INSTRUCTIONS
+## Original release instructions
 
 Connect the following pins with a 4-wire ribbon cable:
 
+```
 My Keepon  <->  Arduino
 ---------       -------
 V               A0
 Cl              A5
 Da              A4
 G               GND
+```
 
 Then compile this code to your Arduino.  (Recommended & tested: Arduino Nano v3.)
   
@@ -39,6 +46,7 @@ With My Keepon powered off, use the Arduino Serial Monitor (or otherwise connect
 Turn on your My Keepon.  You should receive a "My Keepon detected" message.
   
 Allowable commands (the closing semicolon is required):
+```
     SOUND PLAY <0...63>;
     SOUND REPEAT <0...63>;
     SOUND DELAY <msec>;
@@ -52,8 +60,10 @@ Allowable commands (the closing semicolon is required):
     MODE [DANCE, TOUCH];
     MODE TEMPO;
     MODE SLEEP;
+```
 
 Strings that the Arduino can send back to you:
+```
     BUTTON [DANCE, TOUCH] [OFF, ON]
     BUTTON [HEAD, FRONT, BACK, RIGHT, LEFT] [OFF, ON]
     MOTOR [PAN, TILT, SIDE, PON] FINISHED
@@ -69,3 +79,4 @@ Strings that the Arduino can send back to you:
     AUDIO RANGE [0...64] (dynamic range, max 64 for shouting, not updated when motors moving)
     AUDIO ENVELOPE [0...127] (near instantaneous log of the audio amplitude; commented out in code for reduction of data transfer)
     AUDIO BPM [VAL] (estimated beat interval in multiples of 5msec)
+```
